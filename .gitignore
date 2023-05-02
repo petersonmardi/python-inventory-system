@@ -1,0 +1,9 @@
+inventory.py
+generate_sales_report.html
+index_AI.html
+read_items.html
+search_items.html
+inventory/
+instance/
+migrations/
+__pycache__/
