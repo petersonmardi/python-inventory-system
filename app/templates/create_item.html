@@ -1,7 +1,10 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h2>Add Item</h2>
+<h2 class="mb-3 sm-mb-3">Add Item</h2>
+  {% for messages in get_flashed_messages() %}
+    <div class="alert alert-danger mb-3 sm-mb-3">{{ message }}</div>
+  {% endfor %}
 <form method="POST" action="{{ url_for('create_item.create_item') }}">
     <div class="form-group">
         <label>Name</label>
