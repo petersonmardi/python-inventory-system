@@ -1,6 +1,7 @@
 from flask import Flask
-from .extensions import db, migrate
+from .extensions import db, migrate, login_manager
 import os
+from .models.user_management import User
 
 def create_app(test_config=None):
     
@@ -16,6 +17,13 @@ def create_app(test_config=None):
     db.init_app(app)
 
     migrate.init_app(app, db)
+
+    login_manager.init_app(app)
+    login_manager.login_view = 'login.login'
+
+    @login_manager.user_loader
+    def load_user(user_id):
+        return User.query.get(int(user_id))
 
 
     with app.app_context():
@@ -48,6 +56,15 @@ def create_app(test_config=None):
 
     from .routes.delete_item import delete_bp
     app.register_blueprint(delete_bp)
+
+    from .routes.login import login_bp
+    app.register_blueprint(login_bp)
+
+    from .routes.register import register_bp
+    app.register_blueprint(register_bp)
+
+    from .routes.logout import logout_bp
+    app.register_blueprint(logout_bp)
 
 
     return app
