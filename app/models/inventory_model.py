@@ -12,4 +12,4 @@ class InventoryModel(db.Model):
 
 
     def __repr__(self):
-        return 'Name: {self.name}'
+        return f'Name: {self.name}'
