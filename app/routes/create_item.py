@@ -2,7 +2,7 @@ from flask import (
     Blueprint, 
     render_template, 
     request, 
-    jsonify, 
+    flash, 
     url_for, 
     redirect
     )
@@ -11,15 +11,18 @@ from ..models.inventory_model import InventoryModel
 
 from ..extensions import db
 
+from ..extensions import login_required
+
 create_bp = Blueprint('create_item', __name__)
 
 @create_bp.route('/create')
+@login_required
 def create():
     return render_template('create_item.html')
 
 @create_bp.route('/create_item', methods=['POST', 'GET'])
+@login_required
 def create_item():
-    # Get form data
 
     if request.method == 'POST':
 
@@ -30,30 +33,27 @@ def create_item():
         price = float(request.form['price'])
         quantity = int(request.form['quantity'])
 
-        column_of_data = [name, description, price, quantity]
+        if not name:
+            error = 'Name cannot be empty'
+        elif not description:
+            error = 'Description cannot be empty'
+        elif not price:
+            error = 'Price cannot be empty'
+        elif not quantity:
+            error = 'Quantity cannot be empty'
 
-        for element in column_of_data:
-            if element is None:
-                error = 'Input cannot be empty'
-                if error is not None:
-                    flash(error)
-            else:
-                _columns = InventoryModel(
-                                    name=name,
-                                    description=description,
-                                    price=price,
-                                    quantity=quantity
-                )
-                db.session.add(_columns)
-                db.session.commit()
+        if error is None:
+            _columns = InventoryModel(
+                        name=name,
+                        description=description,
+                        price=price,
+                        quantity=quantity
+                        )
+            db.session.add(_columns)
+            db.session.commit()
 
-                return redirect(url_for('index.index'))
-                # return jsonify({'success': True})
+            return redirect(url_for('index.index'))
 
-    # Insert into database
-    # conn = sqlite3.connect('inventory.db')
-    # c = conn.cursor()
-    # c.execute("INSERT INTO items (name, description, price, quantity) VALUES (?, ?, ?, ?)",
-    #           (name, description, price, quantity))
-    # conn.commit()
-    # conn.close()
+        flash(error)
+
+    return render_template('create_item.html')
